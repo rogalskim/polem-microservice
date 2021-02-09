@@ -1,0 +1,627 @@
+{
+  "docs": [
+    {
+      "labels": [
+        {
+          "end": 37,
+          "endToken": 4,
+          "fieldName": "namedEntityML",
+          "name": "sys.Organization",
+          "score": 1.0,
+          "serviceName": "NER",
+          "start": 20,
+          "startToken": 3,
+          "value": "Unii Europejskiej"
+        },
+        {
+          "end": 37,
+          "endToken": 4,
+          "fieldName": "namedEntityML",
+          "name": "sys.Localization",
+          "score": 1.0,
+          "serviceName": "NER",
+          "start": 25,
+          "startToken": 4,
+          "value": "Europejskiej"
+        },
+        {
+          "end": 6,
+          "endToken": 0,
+          "fieldName": "namedEntityML",
+          "name": "sys.Country",
+          "score": 1.0,
+          "serviceName": "NER",
+          "start": 0,
+          "startToken": 0,
+          "value": "Polska"
+        },
+        {
+          "end": 6,
+          "endToken": 1,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 0,
+          "startToken": 0,
+          "value": [
+            "polski"
+          ]
+        },
+        {
+          "end": 6,
+          "endToken": 1,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 0,
+          "startToken": 0,
+          "value": "adj:sg:nom:f:pos"
+        },
+        {
+          "end": 16,
+          "endToken": 2,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 7,
+          "startToken": 1,
+          "value": [
+            "dołączyć"
+          ]
+        },
+        {
+          "end": 16,
+          "endToken": 2,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 7,
+          "startToken": 1,
+          "value": "praet:sg:f:perf"
+        },
+        {
+          "end": 19,
+          "endToken": 3,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 17,
+          "startToken": 2,
+          "value": [
+            "do"
+          ]
+        },
+        {
+          "end": 19,
+          "endToken": 3,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 17,
+          "startToken": 2,
+          "value": "prep:gen"
+        },
+        {
+          "end": 24,
+          "endToken": 4,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 20,
+          "startToken": 3,
+          "value": [
+            "unia"
+          ]
+        },
+        {
+          "end": 24,
+          "endToken": 4,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 20,
+          "startToken": 3,
+          "value": "subst:sg:gen:f"
+        },
+        {
+          "end": 37,
+          "endToken": 5,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 25,
+          "startToken": 4,
+          "value": [
+            "europejski"
+          ]
+        },
+        {
+          "end": 37,
+          "endToken": 5,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 25,
+          "startToken": 4,
+          "value": "adj:sg:gen:f:pos"
+        },
+        {
+          "end": 39,
+          "endToken": 6,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 38,
+          "startToken": 5,
+          "value": [
+            "w"
+          ]
+        },
+        {
+          "end": 39,
+          "endToken": 6,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 38,
+          "startToken": 5,
+          "value": "prep:loc:nwok"
+        },
+        {
+          "end": 44,
+          "endToken": 7,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 40,
+          "startToken": 6,
+          "value": [
+            "2004"
+          ]
+        },
+        {
+          "end": 44,
+          "endToken": 7,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 40,
+          "startToken": 6,
+          "value": "adj:sg:loc:m3:pos"
+        },
+        {
+          "end": 49,
+          "endToken": 8,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 45,
+          "startToken": 7,
+          "value": [
+            "rok"
+          ]
+        },
+        {
+          "end": 49,
+          "endToken": 8,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 45,
+          "startToken": 7,
+          "value": "subst:sg:loc:m3"
+        }
+      ],
+      "raw": "Polska dołączyła do Unii Europejskiej w 2004 roku",
+      "tags": [],
+      "tokens": [
+        {
+          "end": 6,
+          "raw": "Polska",
+          "start": 0
+        },
+        {
+          "end": 16,
+          "raw": "dołączyła",
+          "start": 7
+        },
+        {
+          "end": 19,
+          "raw": "do",
+          "start": 17
+        },
+        {
+          "end": 24,
+          "raw": "Unii",
+          "start": 20
+        },
+        {
+          "end": 37,
+          "raw": "Europejskiej",
+          "start": 25
+        },
+        {
+          "end": 39,
+          "raw": "w",
+          "start": 38
+        },
+        {
+          "end": 44,
+          "raw": "2004",
+          "start": 40
+        },
+        {
+          "end": 49,
+          "raw": "roku",
+          "start": 45
+        }
+      ]
+    },
+    {
+      "labels": [
+        {
+          "end": 25,
+          "endToken": 2,
+          "fieldName": "namedEntityML",
+          "name": "sys.Localization",
+          "score": 1.0,
+          "serviceName": "NER",
+          "start": 0,
+          "startToken": 0,
+          "value": "Ulica Tadeusza Kościuszki"
+        },
+        {
+          "end": 14,
+          "endToken": 1,
+          "fieldName": "namedEntityML",
+          "name": "sys.Forename",
+          "score": 1.0,
+          "serviceName": "NER",
+          "start": 6,
+          "startToken": 1,
+          "value": "Tadeusza"
+        },
+        {
+          "end": 25,
+          "endToken": 2,
+          "fieldName": "namedEntityML",
+          "name": "sys.Surname",
+          "score": 1.0,
+          "serviceName": "NER",
+          "start": 15,
+          "startToken": 2,
+          "value": "Kościuszki"
+        },
+        {
+          "end": 5,
+          "endToken": 1,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 0,
+          "startToken": 0,
+          "value": [
+            "ulica"
+          ]
+        },
+        {
+          "end": 5,
+          "endToken": 1,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 0,
+          "startToken": 0,
+          "value": "subst:sg|nom|f"
+        },
+        {
+          "end": 14,
+          "endToken": 2,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 6,
+          "startToken": 1,
+          "value": [
+            "Tadeusz"
+          ]
+        },
+        {
+          "end": 14,
+          "endToken": 2,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 6,
+          "startToken": 1,
+          "value": "subst:sg|gen|m1"
+        },
+        {
+          "end": 25,
+          "endToken": 3,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 15,
+          "startToken": 2,
+          "value": [
+            "Kościuszko"
+          ]
+        },
+        {
+          "end": 25,
+          "endToken": 3,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 15,
+          "startToken": 2,
+          "value": "subst:sg|gen|m1"
+        },
+        {
+          "end": 30,
+          "endToken": 4,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 26,
+          "startToken": 3,
+          "value": [
+            "być"
+          ]
+        },
+        {
+          "end": 30,
+          "endToken": 4,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 26,
+          "startToken": 3,
+          "value": "fin:sg|ter|imperf"
+        },
+        {
+          "end": 40,
+          "endToken": 5,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 31,
+          "startToken": 4,
+          "value": [
+            "niedaleko"
+          ]
+        },
+        {
+          "end": 40,
+          "endToken": 5,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 31,
+          "startToken": 4,
+          "value": "prep:gen"
+        }
+      ],
+      "raw": "Ulica Tadeusza Kościuszki jest niedaleko",
+      "tags": [],
+      "tokens": [
+        {
+          "end": 5,
+          "raw": "Ulica",
+          "start": 0
+        },
+        {
+          "end": 14,
+          "raw": "Tadeusza",
+          "start": 6
+        },
+        {
+          "end": 25,
+          "raw": "Kościuszki",
+          "start": 15
+        },
+        {
+          "end": 30,
+          "raw": "jest",
+          "start": 26
+        },
+        {
+          "end": 40,
+          "raw": "niedaleko",
+          "start": 31
+        }
+      ]
+    },
+    {
+      "labels": [
+        {
+          "end": 31,
+          "endToken": 4,
+          "fieldName": "namedEntityML",
+          "name": "sys.Localization",
+          "score": 1.0,
+          "serviceName": "NER",
+          "start": 15,
+          "startToken": 3,
+          "value": "Placu Zbawiciela"
+        },
+        {
+          "end": 7,
+          "endToken": 1,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 0,
+          "startToken": 0,
+          "value": [
+            "widzieć"
+          ]
+        },
+        {
+          "end": 7,
+          "endToken": 1,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 0,
+          "startToken": 0,
+          "value": "fin:pl:pri:imperf"
+        },
+        {
+          "end": 11,
+          "endToken": 2,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 8,
+          "startToken": 1,
+          "value": [
+            "się"
+          ]
+        },
+        {
+          "end": 11,
+          "endToken": 2,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 8,
+          "startToken": 1,
+          "value": "qub:"
+        },
+        {
+          "end": 14,
+          "endToken": 3,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 12,
+          "startToken": 2,
+          "value": [
+            "na"
+          ]
+        },
+        {
+          "end": 14,
+          "endToken": 3,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 12,
+          "startToken": 2,
+          "value": "prep:loc"
+        },
+        {
+          "end": 20,
+          "endToken": 4,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 15,
+          "startToken": 3,
+          "value": [
+            "plac"
+          ]
+        },
+        {
+          "end": 20,
+          "endToken": 4,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 15,
+          "startToken": 3,
+          "value": "subst:sg:loc:m3"
+        },
+        {
+          "end": 31,
+          "endToken": 5,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 21,
+          "startToken": 4,
+          "value": [
+            "Zbawiciel"
+          ]
+        },
+        {
+          "end": 31,
+          "endToken": 5,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 21,
+          "startToken": 4,
+          "value": "subst:sg:gen:m1"
+        }
+      ],
+      "raw": "Widzimy się na Placu Zbawiciela",
+      "tags": [],
+      "tokens": [
+        {
+          "end": 7,
+          "raw": "Widzimy",
+          "start": 0
+        },
+        {
+          "end": 11,
+          "raw": "się",
+          "start": 8
+        },
+        {
+          "end": 14,
+          "raw": "na",
+          "start": 12
+        },
+        {
+          "end": 20,
+          "raw": "Placu",
+          "start": 15
+        },
+        {
+          "end": 31,
+          "raw": "Zbawiciela",
+          "start": 21
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "docs": [
+    {
+      "labels": [
+        {
+          "end": 25,
+          "endToken": 2,
+          "fieldName": "namedEntityML",
+          "name": "sys.Settlement",
+          "score": 1.0,
+          "serviceName": "NER",
+          "start": 11,
+          "startToken": 2,
+          "value": "Jerozolimskich"
+        },
+        {
+          "end": 25,
+          "endToken": 2,
+          "fieldName": "namedEntityML",
+          "name": "sys.Localization",
+          "score": 1.0,
+          "serviceName": "NER",
+          "start": 3,
+          "startToken": 1,
+          "value": "Alejach Jerozolimskich"
+        },
+        {
+          "end": 2,
+          "endToken": 1,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 0,
+          "startToken": 0,
+          "value": [
+            "na"
+          ]
+        },
+        {
+          "end": 2,
+          "endToken": 1,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 0,
+          "startToken": 0,
+          "value": "prep:loc"
+        },
+        {
+          "end": 10,
+          "endToken": 2,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 3,
+          "startToken": 1,
+          "value": [
+            "Aleja"
+          ]
+        },
+        {
+          "end": 10,
+          "endToken": 2,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 3,
+          "startToken": 1,
+          "value": "subst:pl:loc:f"
+        },
+        {
+          "end": 25,
+          "endToken": 3,
+          "fieldName": "lemmas",
+          "name": "lemmas",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 11,
+          "startToken": 2,
+          "value": [
+            "Jerozolimski"
+          ]
+        },
+        {
+          "end": 25,
+          "endToken": 3,
+          "fieldName": "posTag",
+          "name": "posTag",
+          "score": 1,
+          "serviceName": "tagger",
+          "start": 11,
+          "startToken": 2,
+          "value": "adj:pl:loc:f:pos"
+        }
+      ],
+      "raw": "Na Alejach Jerozolimskich",
+      "tags": [],
+      "tokens": [
+        {
+          "end": 2,
+          "raw": "Na",
+          "start": 0
+        },
+        {
+          "end": 10,
+          "raw": "Alejach",
+          "start": 3
+        },
+        {
+          "end": 25,
+          "raw": "Jerozolimskich",
+          "start": 11
+        }
+      ]
+    }
+  ]
+}
