@@ -101,3 +101,13 @@ BOOST_AUTO_TEST_CASE(ner_label_finder_returns_correct_labels)
   BOOST_REQUIRE_EQUAL(nerLabels.size(), 1u);
   BOOST_TEST(nerLabels[0] == testNerLabel, "Returned label is not equal to expected label");
 }
+
+BOOST_AUTO_TEST_CASE(lemmatizer_lammatizes)
+{
+  auto input = R"({"value": "Alejach Jerozolimskich"})"_json;
+  auto expected = R"({"value": "aleje jerozolimskie"})"_json;
+
+  auto output = label_processing::lemmatizeNerLabel(input);
+
+  BOOST_TEST(output == expected);
+}

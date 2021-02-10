@@ -2,6 +2,8 @@
 
 #include "label_processing.h"
 
+#include <polem-dev/CascadeLemmatizer.h>
+
 using Json = nlohmann::json;
 
 namespace label_processing
@@ -32,8 +34,20 @@ std::vector<Json> findNerLabels(const Json& labelsArray)
 
 Json lemmatizeNerLabel(const Json& nerLabel)
 {
+  assert(nerLabel.is_object());
+  assert(nerLabel.contains("value"));
+
+  std::string inputValue = nerLabel["value"];
+
+  CascadeLemmatizer lemmatizer = CascadeLemmatizer::assembleLemmatizer();
+  auto lemma = lemmatizer.lemmatize("Alejach Jerozolimskich",
+                                    "aleja jerozolimski",
+                                    "subst:pl:loc:f adj:pl:loc:f:pos",
+                                    false);
   Json lemmatizedLabel = nerLabel;
-  lemmatizedLabel["Hello"] = "there!";
+  std::string str;
+  lemma.toUTF8String(str);
+  lemmatizedLabel["value"] = str;
   return lemmatizedLabel;
 }
 

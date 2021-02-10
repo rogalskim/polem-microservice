@@ -9,3 +9,10 @@ SOURCES += \
 
 HEADERS += \
   label_processing.h
+
+unix: LIBS += -L$$PWD/../../../usr/local/lib/ -lpolem-dev
+
+INCLUDEPATH += $$PWD/../../../usr/local/include
+DEPENDPATH += $$PWD/../../../usr/local/include
+
+unix:!macx: LIBS += -licuuc
