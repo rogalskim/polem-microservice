@@ -4,6 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+        label_processing.cpp \
         main.cpp
 
 HEADERS += \

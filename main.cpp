@@ -35,7 +35,7 @@ Json readJsonFromDisk(const fs::path& path)
 
 int main()
 {
-  auto json = readJsonFromDisk("../data/test_input.json");
+  auto json = readJsonFromDisk("../data/example_input.json");
 
   if (!json.contains(key_names::docsKey))
   {
@@ -43,7 +43,7 @@ int main()
     return 0;
   }
 
-  const auto& docs = json.at(key_names::docsKey);
+  Json& docs = json.at(key_names::docsKey);
   assert(docs.is_array());
 
   if (docs.empty())
@@ -52,17 +52,18 @@ int main()
     return 0;
   }
 
-  std::vector<Json> labels;
-  for (const auto& [key, doc] : docs.items())
+  for (auto& [key, doc] : docs.items())
   {
     if (!doc.is_object() || !doc.contains(key_names::labelsKey))
       continue;
 
-    const auto& labels = doc.at(key_names::labelsKey);
-    const auto& nerLabels = findNerLabels(labels);
-    const auto& polemLabels = lemmatizeNerLabels(nerLabels);
-    //addLemmatizedLabels(&labels, polemLabels);
+    Json& labels = doc.at(key_names::labelsKey);
+    const auto& nerLabels = label_processing::findNerLabels(labels);
+    const auto& polemLabels = label_processing::lemmatizeNerLabels(nerLabels);
+    label_processing::addLemmatizedLabels(labels, polemLabels);
   }
+
+  std::cout << std::setw(4) << docs << std::endl;
 
   return 0;
 }

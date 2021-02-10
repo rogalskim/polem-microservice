@@ -8,7 +8,7 @@
 #include "../label_processing.h"
 
 using Json = nlohmann::json;
-
+using namespace label_processing;
 
 BOOST_AUTO_TEST_CASE(given_lables_object__ner_label_finder_returns_correct_number_of_labels)
 {
