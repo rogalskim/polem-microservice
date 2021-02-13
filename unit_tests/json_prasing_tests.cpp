@@ -108,9 +108,9 @@ BOOST_AUTO_TEST_CASE(ner_label_finder_returns_correct_labels)
 BOOST_AUTO_TEST_SUITE_END()
 
 
-BOOST_AUTO_TEST_SUITE(posTag_list_builder_tests)
+BOOST_AUTO_TEST_SUITE(tag_value_list_builder_tests)
 
-BOOST_AUTO_TEST_CASE(buildPosTagList_returns_vector_of_strings_of_size_equal_to_posTag_label_count)
+BOOST_AUTO_TEST_CASE(buildTagValueList_returns_vector_of_strings_of_size_equal_to_posTag_label_count)
 {
   auto testJson =
     R"({
@@ -136,12 +136,12 @@ BOOST_AUTO_TEST_CASE(buildPosTagList_returns_vector_of_strings_of_size_equal_to_
     })"_json;
 
   std::vector<std::string> posTagValueList
-      = label_processing::buildPosTagList(testJson.at(key_names::labelsKey));
+      = label_processing::buildTagValueList("posTag", testJson.at(key_names::labelsKey));
 
   BOOST_CHECK_EQUAL(posTagValueList.size(), 2u);
 }
 
-BOOST_AUTO_TEST_CASE(buildPosTagList_throws_if_there_is_a_posTag_label_missing)
+BOOST_AUTO_TEST_CASE(buildTagValueList_throws_if_there_is_a_posTag_label_missing)
 {
   auto testJson =
     R"({
@@ -171,11 +171,11 @@ BOOST_AUTO_TEST_CASE(buildPosTagList_throws_if_there_is_a_posTag_label_missing)
        ]
     })"_json;
 
-  BOOST_CHECK_THROW(label_processing::buildPosTagList(testJson.at(key_names::labelsKey)),
+  BOOST_CHECK_THROW(label_processing::buildTagValueList("posTag", testJson.at(key_names::labelsKey)),
                     std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(buildPosTagList_expects_exactly_1_posTag_per_token_otherwise_thorws)
+BOOST_AUTO_TEST_CASE(buildTagValueList_expects_exactly_1_posTag_per_token_otherwise_thorws)
 {
   auto testJson =
     R"({
@@ -191,11 +191,11 @@ BOOST_AUTO_TEST_CASE(buildPosTagList_expects_exactly_1_posTag_per_token_otherwis
        ]
     })"_json;
 
-  BOOST_CHECK_THROW(label_processing::buildPosTagList(testJson.at(key_names::labelsKey)),
+  BOOST_CHECK_THROW(label_processing::buildTagValueList("posTag", testJson.at(key_names::labelsKey)),
                     std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(buildPosTagList_returns_list_of_found_posTag_values)
+BOOST_AUTO_TEST_CASE(buildTagValueList_returns_list_of_found_posTag_values)
 {
   std::vector<Json> posTagList =
   {
@@ -229,13 +229,14 @@ BOOST_AUTO_TEST_CASE(buildPosTagList_returns_list_of_found_posTag_values)
     testJson.at("labels").push_back(testPosTag);
   }
 
-  auto outputPosTagValues = label_processing::buildPosTagList(testJson.at(key_names::labelsKey));
+  auto outputPosTagValues = label_processing::buildTagValueList("posTag",
+                                                                testJson.at(key_names::labelsKey));
 
   BOOST_CHECK_EQUAL_COLLECTIONS(expectedPosTagValues.begin(), expectedPosTagValues.end(),
                                 outputPosTagValues.begin(), outputPosTagValues.end());
 }
 
-BOOST_AUTO_TEST_CASE(buildPosTagList_returns_posTag_list_sorted_by_startToken)
+BOOST_AUTO_TEST_CASE(buildTagValueList_returns_posTag_list_sorted_by_startToken)
 {
   std::vector<Json> posTagList =
   {
@@ -271,16 +272,101 @@ BOOST_AUTO_TEST_CASE(buildPosTagList_returns_posTag_list_sorted_by_startToken)
   testJson.at(key_names::labelsKey).push_back(posTagList[2]);
   testJson.at(key_names::labelsKey).push_back(posTagList[0]);
 
-  auto outputPosTagList = label_processing::buildPosTagList(testJson.at(key_names::labelsKey));
+  auto outputPosTagList = label_processing::buildTagValueList("posTag",
+                                                              testJson.at(key_names::labelsKey));
 
   BOOST_CHECK_EQUAL_COLLECTIONS(expectedPosTagValues.begin(), expectedPosTagValues.end(),
                                 outputPosTagList.begin(), outputPosTagList.end());
 }
 
+BOOST_AUTO_TEST_CASE(buildTagValueList_can_build_both_posTag_and_lemmas_lists)
+{
+  std::vector<Json> posTagList =
+  {
+    R"({
+          "startToken": 0,
+          "endToken": 1,
+          "fieldName": "posTag",
+          "serviceName": "tagger",
+          "value": "FIRST TAG"
+      })"_json,
+    R"({
+          "startToken": 1,
+          "endToken": 2,
+          "fieldName": "posTag",
+          "serviceName": "tagger",
+          "value": "SECOND TAG"
+      })"_json
+  };
+
+  std::vector<Json> lemmaTagList =
+  {
+    R"({
+          "startToken": 0,
+          "endToken": 1,
+          "fieldName": "lemmas",
+          "serviceName": "tagger",
+          "value": ["FIRST LEMMA"]
+      })"_json,
+    R"({
+          "startToken": 1,
+          "endToken": 2,
+          "fieldName": "lemmas",
+          "serviceName": "tagger",
+          "value": ["SECOND LEMMA"]
+      })"_json
+  };
+
+  std::vector<std::string> expectedPosTagValues;
+  auto testJson =R"({"labels": []})"_json;
+  for (const auto& testPosTag : posTagList)
+  {
+    expectedPosTagValues.push_back(testPosTag.at("value"));
+    testJson.at("labels").push_back(testPosTag);
+  }
+  std::vector<std::string> expectedLemmaValues;
+  for (const auto& testLemma : lemmaTagList)
+  {
+    expectedLemmaValues.push_back(testLemma.at("value")[0]);
+    testJson.at("labels").push_back(testLemma);
+  }
+
+  auto outputPosTagValues
+      = label_processing::buildTagValueList("posTag", testJson.at(key_names::labelsKey));
+  auto outputLemmaTagValues
+      = label_processing::buildTagValueList("lemmas", testJson.at(key_names::labelsKey));
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(expectedPosTagValues.begin(), expectedPosTagValues.end(),
+                                outputPosTagValues.begin(), outputPosTagValues.end());
+  BOOST_CHECK_EQUAL_COLLECTIONS(expectedLemmaValues.begin(), expectedLemmaValues.end(),
+                                outputLemmaTagValues.begin(), outputLemmaTagValues.end());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
+BOOST_AUTO_TEST_SUITE(lemmatization_tests)
 
+BOOST_AUTO_TEST_CASE(lemmatizeNerLabels_throws_if_cant_find_posTag_needed_for_a_NER_label)
+{
+  auto testJson =
+    R"({
+      "labels":
+       [
+        {
+          "end": 25,
+          "endToken": 2,
+          "fieldName": "namedEntityML",
+          "name": "sys.Localization",
+          "score": 1.0,
+          "serviceName": "NER",
+          "start": 3,
+          "startToken": 1,
+          "value": "Alejach Jerozolimskich"
+        }
+       ]
+    })"_json;
+}
 
 BOOST_AUTO_TEST_CASE(lemmatizer_lammatizes)
 {
@@ -291,3 +377,5 @@ BOOST_AUTO_TEST_CASE(lemmatizer_lammatizes)
 
   BOOST_TEST(output == expected);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

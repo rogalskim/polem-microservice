@@ -53,8 +53,9 @@ Json lemmatizeNerLabel(const Json& nerLabel)
   return lemmatizedLabel;
 }
 
-std::vector<Json> lemmatizeNerLabels(const std::vector<Json>& nerLabels)
-{
+std::vector<Json> lemmatizeNerLabels(const std::vector<Json>& nerLabels,
+                                     const std::vector<std::string>& posTagValues)
+{ 
   std::vector<Json> lemmatizedLabels;
   for (const auto& nerLabel : nerLabels)
     lemmatizedLabels.push_back(lemmatizeNerLabel(nerLabel));
@@ -68,16 +69,17 @@ void addLemmatizedLabels(Json& targetLabelsArray, const std::vector<Json>& lemma
     targetLabelsArray.push_back(lemmatizedLabel);
 }
 
-std::vector<std::string> buildPosTagList(const Json& labelsArray)
+std::vector<std::string> buildTagValueList(const std::string& tagFieldName,
+                                           const nlohmann::json& labelsArray)
 {
   assert(labelsArray.is_array());
-  std::map<size_t, std::string> posTagPositionMap;
-  std::vector<std::string> posTagValues;
-  auto lastTagPosition = posTagValues.size();
+  std::map<size_t, std::string> tagPositionMap;
+  std::vector<std::string> tagValues;
+  auto lastTagPosition = tagValues.size();
 
   for (const auto& label : labelsArray)
   {
-    if (label.at(key_names::labelField) != "posTag")
+    if (label.at(key_names::labelField) != tagFieldName)
       continue;
 
     size_t tagPosition = label.at("startToken");
@@ -88,16 +90,19 @@ std::vector<std::string> buildPosTagList(const Json& labelsArray)
     if (tagPosition > lastTagPosition)
       lastTagPosition = tagPosition;
 
-    posTagPositionMap[tagPosition] = label.at("value");
+    if (label.at("value").is_array())
+      tagPositionMap[tagPosition] = label.at("value")[0];
+    else
+      tagPositionMap[tagPosition] = label.at("value");
   }
 
-  if (lastTagPosition+1 > posTagPositionMap.size())
+  if (lastTagPosition+1 > tagPositionMap.size())
     throw std::runtime_error("There are missing posTag labels!");
 
   for (size_t i = 0; i <= lastTagPosition; ++i)
-    posTagValues.push_back(posTagPositionMap[i]);
+    tagValues.push_back(tagPositionMap[i]);
 
-  return posTagValues;
+  return tagValues;
 }
 
 }
