@@ -19,7 +19,7 @@ namespace label_processing
 
 std::vector<nlohmann::json> findNerLabels(const nlohmann::json& labelsArray);
 
-std::vector<nlohmann::json> buildPosTagList(const nlohmann::json& labelsArray);
+std::vector<std::string> buildPosTagList(const nlohmann::json& labelsArray);
 
 nlohmann::json lemmatizeNerLabel(const nlohmann::json& nerLabel);
 

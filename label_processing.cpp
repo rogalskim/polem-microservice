@@ -68,12 +68,12 @@ void addLemmatizedLabels(Json& targetLabelsArray, const std::vector<Json>& lemma
     targetLabelsArray.push_back(lemmatizedLabel);
 }
 
-std::vector<Json> buildPosTagList(const Json& labelsArray)
+std::vector<std::string> buildPosTagList(const Json& labelsArray)
 {
   assert(labelsArray.is_array());
-  std::map<size_t, Json> posTagPositionMap;
-  std::vector<Json> posTagList;
-  auto lastTagPosition = posTagList.size();
+  std::map<size_t, std::string> posTagPositionMap;
+  std::vector<std::string> posTagValues;
+  auto lastTagPosition = posTagValues.size();
 
   for (const auto& label : labelsArray)
   {
@@ -88,16 +88,16 @@ std::vector<Json> buildPosTagList(const Json& labelsArray)
     if (tagPosition > lastTagPosition)
       lastTagPosition = tagPosition;
 
-    posTagPositionMap[tagPosition] = label;
+    posTagPositionMap[tagPosition] = label.at("value");
   }
 
   if (lastTagPosition+1 > posTagPositionMap.size())
     throw std::runtime_error("There are missing posTag labels!");
 
   for (size_t i = 0; i <= lastTagPosition; ++i)
-    posTagList.push_back(posTagPositionMap[i]);
+    posTagValues.push_back(posTagPositionMap[i]);
 
-  return posTagList;
+  return posTagValues;
 }
 
 }

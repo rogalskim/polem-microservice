@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(posTag_list_builder_tests)
 
-BOOST_AUTO_TEST_CASE(buildPosTagList_returns_vector_of_Jsons_of_size_equal_to_posTag_label_count)
+BOOST_AUTO_TEST_CASE(buildPosTagList_returns_vector_of_strings_of_size_equal_to_posTag_label_count)
 {
   auto testJson =
     R"({
@@ -135,10 +135,10 @@ BOOST_AUTO_TEST_CASE(buildPosTagList_returns_vector_of_Jsons_of_size_equal_to_po
        ]
     })"_json;
 
-  std::vector<Json> posTagList
+  std::vector<std::string> posTagValueList
       = label_processing::buildPosTagList(testJson.at(key_names::labelsKey));
 
-  BOOST_CHECK_EQUAL(posTagList.size(), 2u);
+  BOOST_CHECK_EQUAL(posTagValueList.size(), 2u);
 }
 
 BOOST_AUTO_TEST_CASE(buildPosTagList_throws_if_there_is_a_posTag_label_missing)
@@ -195,9 +195,9 @@ BOOST_AUTO_TEST_CASE(buildPosTagList_expects_exactly_1_posTag_per_token_otherwis
                     std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(buildPosTagList_returns_list_of_found_posTag_labels)
+BOOST_AUTO_TEST_CASE(buildPosTagList_returns_list_of_found_posTag_values)
 {
-  std::vector<Json> expectedPosTagList =
+  std::vector<Json> posTagList =
   {
     R"({
           "startToken": 0,
@@ -221,20 +221,23 @@ BOOST_AUTO_TEST_CASE(buildPosTagList_returns_list_of_found_posTag_labels)
           "value": "THIRD TAG"
       })"_json
   };
-
+  std::vector<std::string> expectedPosTagValues;
   auto testJson =R"({"labels": []})"_json;
-  for (const auto& testPosTag : expectedPosTagList)
+  for (const auto& testPosTag : posTagList)
+  {
+    expectedPosTagValues.push_back(testPosTag.at("value"));
     testJson.at("labels").push_back(testPosTag);
+  }
 
-  auto outputPosTagList = label_processing::buildPosTagList(testJson.at(key_names::labelsKey));
+  auto outputPosTagValues = label_processing::buildPosTagList(testJson.at(key_names::labelsKey));
 
-  BOOST_CHECK_EQUAL_COLLECTIONS(expectedPosTagList.begin(), expectedPosTagList.end(),
-                                outputPosTagList.begin(), outputPosTagList.end());
+  BOOST_CHECK_EQUAL_COLLECTIONS(expectedPosTagValues.begin(), expectedPosTagValues.end(),
+                                outputPosTagValues.begin(), outputPosTagValues.end());
 }
 
 BOOST_AUTO_TEST_CASE(buildPosTagList_returns_posTag_list_sorted_by_startToken)
 {
-  std::vector<Json> expectedPosTagList =
+  std::vector<Json> posTagList =
   {
     R"({
           "startToken": 0,
@@ -259,14 +262,18 @@ BOOST_AUTO_TEST_CASE(buildPosTagList_returns_posTag_list_sorted_by_startToken)
       })"_json
   };
 
+  std::vector<std::string> expectedPosTagValues;
+  for (const auto& testPosTag : posTagList)
+    expectedPosTagValues.push_back(testPosTag.at("value"));
+
   auto testJson =R"({"labels": []})"_json;
-  testJson.at(key_names::labelsKey).push_back(expectedPosTagList[1]);
-  testJson.at(key_names::labelsKey).push_back(expectedPosTagList[2]);
-  testJson.at(key_names::labelsKey).push_back(expectedPosTagList[0]);
+  testJson.at(key_names::labelsKey).push_back(posTagList[1]);
+  testJson.at(key_names::labelsKey).push_back(posTagList[2]);
+  testJson.at(key_names::labelsKey).push_back(posTagList[0]);
 
   auto outputPosTagList = label_processing::buildPosTagList(testJson.at(key_names::labelsKey));
 
-  BOOST_CHECK_EQUAL_COLLECTIONS(expectedPosTagList.begin(), expectedPosTagList.end(),
+  BOOST_CHECK_EQUAL_COLLECTIONS(expectedPosTagValues.begin(), expectedPosTagValues.end(),
                                 outputPosTagList.begin(), outputPosTagList.end());
 }
 
