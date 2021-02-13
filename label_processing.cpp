@@ -151,4 +151,40 @@ std::vector<std::string> buildTagValueList(const std::string& tagFieldName,
   return tagValues;
 }
 
+void findAndLemmatizeNerLabelsInJson(nlohmann::json& targetJson)
+{
+  if (!targetJson.contains(key_names::docsKey))
+    throw std::runtime_error("Input JSON doesn't contain \"" + key_names::docsKey + "\" key");
+
+  Json& docs = targetJson.at(key_names::docsKey);
+  assert(docs.is_array());
+
+  if (docs.empty())
+    throw std::runtime_error("\"" + key_names::docsKey + "\" item is empty");
+
+  for (auto& [key, doc] : docs.items())
+  {
+    if (!doc.is_object() || !doc.contains(key_names::labelsKey))
+      continue;
+
+    Json& labelArray = doc.at(key_names::labelsKey);
+    if (!labelArray.is_array() || labelArray.empty())
+      continue;
+
+    try
+    {
+      const auto& nerLabels = label_processing::findNerLabels(labelArray);
+      const auto& posTagValues = label_processing::buildTagValueList("posTag", labelArray);
+      const auto& lemmaTagValues = label_processing::buildTagValueList("lemmas", labelArray);
+      const auto&  lemmatizedLabels
+          = label_processing::lemmatizeNerLabels(nerLabels, posTagValues, lemmaTagValues);
+      label_processing::addLemmatizedLabels(labelArray, lemmatizedLabels);
+    }
+    catch (const std::runtime_error& exception)
+    {
+      std::cout << std::string("Processing a doc element failed!\n") + exception.what() + "\n";
+    }
+  }
+}
+
 }

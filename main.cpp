@@ -35,45 +35,16 @@ Json readJsonFromDisk(const fs::path& path)
 
 int main()
 {
-  auto json = readJsonFromDisk("../data/example_input.json");
-
-  if (!json.contains(key_names::docsKey))
+  try
   {
-    std::cerr << "Input JSON doesn't contain \"" + key_names::docsKey + "\" key; exitting.\n";
+    auto json = readJsonFromDisk("../data/example_input.json");
+    label_processing::findAndLemmatizeNerLabelsInJson(json);
+    std::cout << std::setw(4) << json << std::endl;
     return 0;
   }
-
-  Json& docs = json.at(key_names::docsKey);
-  assert(docs.is_array());
-
-  if (docs.empty())
+  catch (const std::runtime_error& exception)
   {
-    std::cerr << "\"" + key_names::docsKey + "\" item is empty; exitting.\n";
-    return 0;
+    std::cout << exception.what() << "\nAborting...\n";
+    return 1;
   }
-
-  for (auto& [key, doc] : docs.items())
-  {
-    if (!doc.is_object() || !doc.contains(key_names::labelsKey))
-      continue;
-
-    Json& labels = doc.at(key_names::labelsKey);
-    if (!labels.is_array() || labels.empty())
-      continue;
-
-    try
-    {
-      const auto& nerLabels = label_processing::findNerLabels(labels);
-      const auto& polemLabels = label_processing::lemmatizeNerLabels(nerLabels);
-      label_processing::addLemmatizedLabels(labels, polemLabels);
-    }
-    catch (const std::runtime_error& exception)
-    {
-      std::cout << std::string("Processing a doc element failed!\n") + exception.what() + "\n";
-    }
-  }
-
-  std::cout << std::setw(4) << docs << std::endl;
-
-  return 0;
 }

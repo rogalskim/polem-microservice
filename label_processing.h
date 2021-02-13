@@ -39,6 +39,8 @@ std::vector<nlohmann::json> lemmatizeNerLabels(const std::vector<nlohmann::json>
 void addLemmatizedLabels(nlohmann::json& targetLabelsArray,
                          const std::vector<nlohmann::json>& lemmatizedLabels);
 
+void findAndLemmatizeNerLabelsInJson(nlohmann::json& targetJson);
+
 }
 
 #endif // LABEL_PROCESSING_H
