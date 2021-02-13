@@ -13,8 +13,8 @@ isEmpty(BOOST_INCLUDE_DIR): {
 }
 
 SOURCES += \
-  ../label_processing.cpp \
   json_prasing_tests.cpp \
+  ../label_processing.cpp \
 
 HEADERS += \
   ../label_processing.h

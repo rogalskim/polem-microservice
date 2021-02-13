@@ -37,14 +37,14 @@ std::vector<Json> findNerLabels(const Json& labelsArray)
 
 Json lemmatizeNerLabel(const Json& nerLabel,
                        const std::string& posTags,
-                       const std::string& lemmaTags)
+                       const std::string& lemmaTags,
+                       CascadeLemmatizer& lemmatizer)
 {
   assert(nerLabel.is_object());
   assert(nerLabel.contains("value"));
 
   const std::string& inputValue = nerLabel["value"];
 
-  CascadeLemmatizer lemmatizer = CascadeLemmatizer::assembleLemmatizer();
   auto output = lemmatizer.lemmatize(inputValue.c_str(), lemmaTags.c_str(), posTags.c_str(), false);
 
   Json lemmatizedNer = nerLabel;
@@ -92,7 +92,8 @@ buildPosAndLemmaStringsForNerLabel(const Json& nerLabel,
 
 std::vector<Json> lemmatizeNerLabels(const std::vector<nlohmann::json>& nerLabels,
                                      const std::vector<std::string>& posTagValues,
-                                     const std::vector<std::string>& lemmaTagValues)
+                                     const std::vector<std::string>& lemmaTagValues,
+                                     CascadeLemmatizer& lemmatizer)
 { 
   if (posTagValues.size() != lemmaTagValues.size())
     throw std::runtime_error("Different counts of posTag and lemma labels!");
@@ -103,7 +104,8 @@ std::vector<Json> lemmatizeNerLabels(const std::vector<nlohmann::json>& nerLabel
     auto posTagAndLemma = buildPosAndLemmaStringsForNerLabel(nerLabel, posTagValues, lemmaTagValues);
     lemmatizedLabels.push_back(lemmatizeNerLabel(nerLabel,
                                                  std::get<0>(posTagAndLemma),
-                                                 std::get<1>(posTagAndLemma)));
+                                                 std::get<1>(posTagAndLemma),
+                                                 lemmatizer));
   }
   return lemmatizedLabels;
 }
@@ -162,6 +164,8 @@ void findAndLemmatizeNerLabelsInJson(nlohmann::json& targetJson)
   if (docs.empty())
     throw std::runtime_error("\"" + key_names::docsKey + "\" item is empty");
 
+  CascadeLemmatizer lemmatizer = CascadeLemmatizer::assembleLemmatizer();
+
   for (auto& [key, doc] : docs.items())
   {
     if (!doc.is_object() || !doc.contains(key_names::labelsKey))
@@ -176,8 +180,10 @@ void findAndLemmatizeNerLabelsInJson(nlohmann::json& targetJson)
       const auto& nerLabels = label_processing::findNerLabels(labelArray);
       const auto& posTagValues = label_processing::buildTagValueList("posTag", labelArray);
       const auto& lemmaTagValues = label_processing::buildTagValueList("lemmas", labelArray);
-      const auto&  lemmatizedLabels
-          = label_processing::lemmatizeNerLabels(nerLabels, posTagValues, lemmaTagValues);
+      const auto&  lemmatizedLabels = label_processing::lemmatizeNerLabels(nerLabels,
+                                                                           posTagValues,
+                                                                           lemmaTagValues,
+                                                                           lemmatizer);
       label_processing::addLemmatizedLabels(labelArray, lemmatizedLabels);
     }
     catch (const std::runtime_error& exception)

@@ -15,6 +15,8 @@ const std::string labelService = "serviceName";
 const std::string labelField = "fieldName";
 }
 
+class CascadeLemmatizer;
+
 namespace label_processing
 {
 
@@ -25,7 +27,8 @@ std::vector<std::string> buildTagValueList(const std::string& tagFieldName,
 
 nlohmann::json lemmatizeNerLabel(const nlohmann::json& nerLabel,
                                  const std::string& posTags,
-                                 const std::string& lemmaTags);
+                                 const std::string& lemmaTags,
+                                 CascadeLemmatizer& lemmatizer);
 
 std::tuple<std::string, std::string>
 buildPosAndLemmaStringsForNerLabel(const nlohmann::json& nerLabel,
@@ -34,7 +37,8 @@ buildPosAndLemmaStringsForNerLabel(const nlohmann::json& nerLabel,
 
 std::vector<nlohmann::json> lemmatizeNerLabels(const std::vector<nlohmann::json>& nerLabels,
                                                const std::vector<std::string>& posTagValues,
-                                               const std::vector<std::string>& lemmaTagValues);
+                                               const std::vector<std::string>& lemmaTagValues,
+                                               CascadeLemmatizer& lemmatizer);
 
 void addLemmatizedLabels(nlohmann::json& targetLabelsArray,
                          const std::vector<nlohmann::json>& lemmatizedLabels);

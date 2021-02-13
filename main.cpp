@@ -37,7 +37,7 @@ int main()
 {
   try
   {
-    auto json = readJsonFromDisk("../data/example_input.json");
+    auto json = readJsonFromDisk("../data/test_input.json");
     label_processing::findAndLemmatizeNerLabelsInJson(json);
     std::cout << std::setw(4) << json << std::endl;
     return 0;

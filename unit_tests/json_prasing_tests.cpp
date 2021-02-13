@@ -4,12 +4,13 @@
 
 #include <boost/test/included/unit_test.hpp>
 
+#include <polem-dev/CascadeLemmatizer.h>
+
 #include "../nlohmann_json/json.hpp"
 #include "../label_processing.h"
 
 using Json = nlohmann::json;
 using namespace label_processing;
-
 
 BOOST_AUTO_TEST_SUITE(ner_finding_tests)
 
@@ -378,8 +379,12 @@ BOOST_AUTO_TEST_CASE(lemmatizeNerLabels_throws_if_posTag_and_lemmaTag_sizes_not_
   auto nerLabels = label_processing::findNerLabels(labelArray);
   auto posTagValues = label_processing::buildTagValueList("posTag", labelArray);
   auto lemmaTagValues = label_processing::buildTagValueList("lemmas", labelArray);
+  CascadeLemmatizer lemmatizer = CascadeLemmatizer::assembleLemmatizer();
 
-  BOOST_CHECK_THROW(label_processing::lemmatizeNerLabels(nerLabels, posTagValues, lemmaTagValues),
+  BOOST_CHECK_THROW(label_processing::lemmatizeNerLabels(nerLabels,
+                                                         posTagValues,
+                                                         lemmaTagValues,
+                                                         lemmatizer),
                     std::runtime_error);
 }
 
@@ -503,8 +508,10 @@ BOOST_AUTO_TEST_CASE(lemmatizeNerLabel_lemmatizes_label_correctly)
 
   auto inputPosTags = "subst:pl:loc:f adj:pl:loc:f:pos";
   auto inputLemmaTags = "aleja jerozolimski";
+  CascadeLemmatizer lemmatizer = CascadeLemmatizer::assembleLemmatizer();
 
-  auto outputNer = label_processing::lemmatizeNerLabel(inputNer, inputPosTags, inputLemmaTags);
+  auto outputNer
+      = label_processing::lemmatizeNerLabel(inputNer, inputPosTags, inputLemmaTags, lemmatizer);
 
   BOOST_TEST(outputNer == expectedNer);
 }
@@ -640,11 +647,13 @@ BOOST_AUTO_TEST_CASE(lemmatizeNerLabels_returns_correct_lemmatized_NER_labels)
   auto nerLabels = label_processing::findNerLabels(labelArray);
   auto posTagValues = label_processing::buildTagValueList("posTag", labelArray);
   auto lemmaTagValues = label_processing::buildTagValueList("lemmas", labelArray);
+  CascadeLemmatizer lemmatizer = CascadeLemmatizer::assembleLemmatizer();
 
   auto lemmatizedLabels
-      = label_processing::lemmatizeNerLabels(nerLabels, posTagValues, lemmaTagValues);
+      = label_processing::lemmatizeNerLabels(nerLabels, posTagValues, lemmaTagValues, lemmatizer);
 
   BOOST_CHECK_EQUAL(expectedLemmatizedLabels, lemmatizedLabels);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
