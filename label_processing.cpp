@@ -1,4 +1,6 @@
 #include <cassert>
+#include <exception>
+#include <map>
 
 #include "label_processing.h"
 
@@ -19,10 +21,10 @@ std::vector<Json> findNerLabels(const Json& labelsArray)
 
   for (const auto& [key, label] : labelsArray.items())
   {
-    if (!label.is_object() || !label.contains(key_names::labelType))
+    if (!label.is_object() || !label.contains(key_names::labelService))
       continue;
 
-    auto labelType = label.at(key_names::labelType);
+    auto labelType = label.at(key_names::labelService);
     if (labelType != "NER")
       continue;
 
@@ -64,6 +66,38 @@ void addLemmatizedLabels(Json& targetLabelsArray, const std::vector<Json>& lemma
   assert(targetLabelsArray.is_array());
   for (const auto& lemmatizedLabel : lemmatizedLabels)
     targetLabelsArray.push_back(lemmatizedLabel);
+}
+
+std::vector<Json> buildPosTagList(const Json& labelsArray)
+{
+  assert(labelsArray.is_array());
+  std::map<size_t, Json> posTagPositionMap;
+  std::vector<Json> posTagList;
+  auto lastTagPosition = posTagList.size();
+
+  for (const auto& label : labelsArray)
+  {
+    if (label.at(key_names::labelField) != "posTag")
+      continue;
+
+    size_t tagPosition = label.at("startToken");
+    size_t tagEnd = label.at("endToken");
+    if (tagEnd - tagPosition > 1)
+      throw std::runtime_error("posTag endToken-startToken > 1");
+
+    if (tagPosition > lastTagPosition)
+      lastTagPosition = tagPosition;
+
+    posTagPositionMap[tagPosition] = label;
+  }
+
+  if (lastTagPosition+1 > posTagPositionMap.size())
+    throw std::runtime_error("There are missing posTag labels!");
+
+  for (size_t i = 0; i <= lastTagPosition; ++i)
+    posTagList.push_back(posTagPositionMap[i]);
+
+  return posTagList;
 }
 
 }

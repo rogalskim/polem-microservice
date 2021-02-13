@@ -58,9 +58,19 @@ int main()
       continue;
 
     Json& labels = doc.at(key_names::labelsKey);
-    const auto& nerLabels = label_processing::findNerLabels(labels);
-    const auto& polemLabels = label_processing::lemmatizeNerLabels(nerLabels);
-    label_processing::addLemmatizedLabels(labels, polemLabels);
+    if (!labels.is_array() || labels.empty())
+      continue;
+
+    try
+    {
+      const auto& nerLabels = label_processing::findNerLabels(labels);
+      const auto& polemLabels = label_processing::lemmatizeNerLabels(nerLabels);
+      label_processing::addLemmatizedLabels(labels, polemLabels);
+    }
+    catch (const std::runtime_error& exception)
+    {
+      std::cout << std::string("Processing a doc element failed!\n") + exception.what() + "\n";
+    }
   }
 
   std::cout << std::setw(4) << docs << std::endl;

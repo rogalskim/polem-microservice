@@ -10,13 +10,16 @@ namespace key_names
 {
 const std::string docsKey = "docs";
 const std::string labelsKey = "labels";
-const std::string labelType = "serviceName";
+const std::string labelService = "serviceName";
+const std::string labelField = "fieldName";
 }
 
 namespace label_processing
 {
 
 std::vector<nlohmann::json> findNerLabels(const nlohmann::json& labelsArray);
+
+std::vector<nlohmann::json> buildPosTagList(const nlohmann::json& labelsArray);
 
 nlohmann::json lemmatizeNerLabel(const nlohmann::json& nerLabel);
 
