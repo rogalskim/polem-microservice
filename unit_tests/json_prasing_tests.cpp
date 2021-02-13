@@ -347,35 +347,304 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(lemmatization_tests)
 
-BOOST_AUTO_TEST_CASE(lemmatizeNerLabels_throws_if_cant_find_posTag_needed_for_a_NER_label)
+BOOST_AUTO_TEST_CASE(lemmatizeNerLabels_throws_if_posTag_and_lemmaTag_sizes_not_equal)
 {
   auto testJson =
     R"({
       "labels":
        [
         {
-          "end": 25,
-          "endToken": 2,
-          "fieldName": "namedEntityML",
-          "name": "sys.Localization",
-          "score": 1.0,
-          "serviceName": "NER",
-          "start": 3,
+          "startToken": 0,
+          "endToken": 1,
+          "fieldName": "lemmas",
+          "value": ["FIRST LEMMA"]
+        },
+        {
+          "startToken": 0,
+          "endToken": 1,
+          "fieldName": "posTag",
+          "value": "FIRST POSTAG"
+        },
+        {
           "startToken": 1,
-          "value": "Alejach Jerozolimskich"
+          "endToken": 2,
+          "fieldName": "lemmas",
+          "value": ["SECOND LEMMA"]
         }
        ]
     })"_json;
+
+  auto labelArray = testJson.at(key_names::labelsKey);
+  auto nerLabels = label_processing::findNerLabels(labelArray);
+  auto posTagValues = label_processing::buildTagValueList("posTag", labelArray);
+  auto lemmaTagValues = label_processing::buildTagValueList("lemmas", labelArray);
+
+  BOOST_CHECK_THROW(label_processing::lemmatizeNerLabels(nerLabels, posTagValues, lemmaTagValues),
+                    std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(lemmatizer_lammatizes)
+BOOST_AUTO_TEST_CASE(string_builder_throws_if_cant_find_posTag_needed_for_a_NER_label)
 {
-  auto input = R"({"value": "Alejach Jerozolimskich"})"_json;
-  auto expected = R"({"value": "aleje jerozolimskie"})"_json;
+  auto testJson =
+    R"({
+      "labels":
+       [
+        {
+          "startToken": 0,
+          "endToken": 1,
+          "fieldName": "namedEntityML",
+          "serviceName": "NER",
+          "value": "Alejach Jerozolimskich"
+        },
+        {
+          "startToken": 0,
+          "endToken": 1,
+          "fieldName": "lemmas",
+          "value": ["na"]
+        },
+        {
+          "startToken": 0,
+          "endToken": 1,
+          "fieldName": "posTag",
+          "value": "prep:loc"
+        }
+       ]
+    })"_json;
 
-  auto output = label_processing::lemmatizeNerLabel(input);
+  auto labelArray = testJson.at(key_names::labelsKey);
+  auto nerLabels = label_processing::findNerLabels(labelArray);
+  auto posTagValues = label_processing::buildTagValueList("posTag", labelArray);
+  auto lemmaTagValues = label_processing::buildTagValueList("lemmas", labelArray);
 
-  BOOST_TEST(output == expected);
+  BOOST_CHECK_THROW(label_processing::buildPosAndLemmaStringsForNerLabel(
+                      nerLabels[0], posTagValues, lemmaTagValues),
+                    std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(string_builder_returns_correct_posTag_and_lemma_strings)
+{
+  auto testJson =
+    R"({
+      "labels":
+       [
+        {
+          "startToken": 0,
+          "endToken": 1,
+          "fieldName": "namedEntityML",
+          "serviceName": "NER",
+          "value": "Alejach Jerozolimskich"
+        },
+        {
+          "startToken": 0,
+          "endToken": 1,
+          "fieldName": "lemmas",
+          "value": ["LEMMA_0"]
+        },
+        {
+          "startToken": 0,
+          "endToken": 1,
+          "fieldName": "posTag",
+          "value": "POSTAG_0"
+        },
+        {
+          "startToken": 1,
+          "endToken": 2,
+          "fieldName": "lemmas",
+          "value": ["LEMMA_1"]
+        },
+        {
+          "startToken": 1,
+          "endToken": 2,
+          "fieldName": "posTag",
+          "value": "POSTAG_1"
+        }
+       ]
+    })"_json;
+
+  auto labelArray = testJson.at(key_names::labelsKey);
+  auto nerLabels = label_processing::findNerLabels(labelArray);
+  auto posTagValues = label_processing::buildTagValueList("posTag", labelArray);
+  auto lemmaTagValues = label_processing::buildTagValueList("lemmas", labelArray);
+  std::string expectedPosTag = "postag_0 postag_1";
+  std::string expectedLemma = "lemma_0 lemma_1";
+
+  auto result = label_processing::buildPosAndLemmaStringsForNerLabel(
+        nerLabels[0], posTagValues, lemmaTagValues);
+
+  BOOST_CHECK_EQUAL(std::get<0>(result), expectedPosTag);
+  BOOST_CHECK_EQUAL(std::get<1>(result), expectedLemma);
+}
+
+BOOST_AUTO_TEST_CASE(lemmatizeNerLabel_lemmatizes_label_correctly)
+{
+  auto inputNer = R"({
+                      "end": 25,
+                      "endToken": 2,
+                      "fieldName": "namedEntityML",
+                      "name": "sys.Localization",
+                      "score": 1.0,
+                      "serviceName": "NER",
+                      "start": 3,
+                      "startToken": 1,
+                      "value": "Alejach Jerozolimskich"
+                     })"_json;
+
+  auto expectedNer = R"({
+                         "end": 25,
+                         "endToken": 2,
+                         "fieldName": "polem",
+                         "name": "polem",
+                         "score": 1.0,
+                         "serviceName": "Polem",
+                         "start": 3,
+                         "startToken": 1,
+                         "value": "aleje jerozolimskie"
+                        })"_json;
+
+  auto inputPosTags = "subst:pl:loc:f adj:pl:loc:f:pos";
+  auto inputLemmaTags = "aleja jerozolimski";
+
+  auto outputNer = label_processing::lemmatizeNerLabel(inputNer, inputPosTags, inputLemmaTags);
+
+  BOOST_TEST(outputNer == expectedNer);
+}
+
+BOOST_AUTO_TEST_CASE(lemmatizeNerLabels_returns_correct_lemmatized_NER_labels)
+{
+  auto testJson =
+    R"({
+        "labels": [
+          {
+            "end": 25,
+            "endToken": 2,
+            "fieldName": "namedEntityML",
+            "name": "sys.Settlement",
+            "score": 1.0,
+            "serviceName": "NER",
+            "start": 11,
+            "startToken": 2,
+            "value": "Jerozolimskich"
+          },
+          {
+            "end": 25,
+            "endToken": 2,
+            "fieldName": "namedEntityML",
+            "name": "sys.Localization",
+            "score": 1.0,
+            "serviceName": "NER",
+            "start": 3,
+            "startToken": 1,
+            "value": "Alejach Jerozolimskich"
+          },
+          {
+            "end": 2,
+            "endToken": 1,
+            "fieldName": "lemmas",
+            "name": "lemmas",
+            "score": 1,
+            "serviceName": "tagger",
+            "start": 0,
+            "startToken": 0,
+            "value": [
+              "na"
+            ]
+          },
+          {
+            "end": 2,
+            "endToken": 1,
+            "fieldName": "posTag",
+            "name": "posTag",
+            "score": 1,
+            "serviceName": "tagger",
+            "start": 0,
+            "startToken": 0,
+            "value": "prep:loc"
+          },
+          {
+            "end": 10,
+            "endToken": 2,
+            "fieldName": "lemmas",
+            "name": "lemmas",
+            "score": 1,
+            "serviceName": "tagger",
+            "start": 3,
+            "startToken": 1,
+            "value": [
+              "Aleja"
+            ]
+          },
+          {
+            "end": 10,
+            "endToken": 2,
+            "fieldName": "posTag",
+            "name": "posTag",
+            "score": 1,
+            "serviceName": "tagger",
+            "start": 3,
+            "startToken": 1,
+            "value": "subst:pl:loc:f"
+          },
+          {
+            "end": 25,
+            "endToken": 3,
+            "fieldName": "lemmas",
+            "name": "lemmas",
+            "score": 1,
+            "serviceName": "tagger",
+            "start": 11,
+            "startToken": 2,
+            "value": [
+              "Jerozolimski"
+            ]
+          },
+          {
+            "end": 25,
+            "endToken": 3,
+            "fieldName": "posTag",
+            "name": "posTag",
+            "score": 1,
+            "serviceName": "tagger",
+            "start": 11,
+            "startToken": 2,
+            "value": "adj:pl:loc:f:pos"
+          }
+        ]})"_json;
+
+  std::vector<Json> expectedLemmatizedLabels;
+  expectedLemmatizedLabels.push_back(
+    R"({
+        "end": 25,
+        "endToken": 2,
+        "fieldName": "polem",
+        "name": "polem",
+        "score": 1.0,
+        "serviceName": "Polem",
+        "start": 11,
+        "startToken": 2,
+        "value": "jerozolimscy"
+      })"_json);
+  expectedLemmatizedLabels.push_back(
+    R"({
+        "end": 25,
+        "endToken": 2,
+        "fieldName": "polem",
+        "name": "polem",
+        "score": 1.0,
+        "serviceName": "Polem",
+        "start": 3,
+        "startToken": 1,
+        "value": "aleje jerozolimskie"
+       })"_json);
+
+  auto labelArray = testJson.at(key_names::labelsKey);
+  auto nerLabels = label_processing::findNerLabels(labelArray);
+  auto posTagValues = label_processing::buildTagValueList("posTag", labelArray);
+  auto lemmaTagValues = label_processing::buildTagValueList("lemmas", labelArray);
+
+  auto lemmatizedLabels
+      = label_processing::lemmatizeNerLabels(nerLabels, posTagValues, lemmaTagValues);
+
+  BOOST_CHECK_EQUAL(expectedLemmatizedLabels, lemmatizedLabels);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

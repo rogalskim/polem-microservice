@@ -1,4 +1,5 @@
 #include <cassert>
+#include <cctype>
 #include <exception>
 #include <map>
 
@@ -34,31 +35,76 @@ std::vector<Json> findNerLabels(const Json& labelsArray)
   return nerLabels;
 }
 
-Json lemmatizeNerLabel(const Json& nerLabel)
+Json lemmatizeNerLabel(const Json& nerLabel,
+                       const std::string& posTags,
+                       const std::string& lemmaTags)
 {
   assert(nerLabel.is_object());
   assert(nerLabel.contains("value"));
 
-  std::string inputValue = nerLabel["value"];
+  const std::string& inputValue = nerLabel["value"];
 
   CascadeLemmatizer lemmatizer = CascadeLemmatizer::assembleLemmatizer();
-  auto lemma = lemmatizer.lemmatize("Alejach Jerozolimskich",
-                                    "aleja jerozolimski",
-                                    "subst:pl:loc:f adj:pl:loc:f:pos",
-                                    false);
-  Json lemmatizedLabel = nerLabel;
-  std::string str;
-  lemma.toUTF8String(str);
-  lemmatizedLabel["value"] = str;
-  return lemmatizedLabel;
+  auto output = lemmatizer.lemmatize(inputValue.c_str(), lemmaTags.c_str(), posTags.c_str(), false);
+
+  Json lemmatizedNer = nerLabel;
+  std::string strOutput;
+  output.toUTF8String(strOutput);
+  lemmatizedNer["value"] = strOutput;
+  lemmatizedNer[key_names::labelField] = "polem";
+  lemmatizedNer["name"] = "polem";
+  lemmatizedNer[key_names::labelService] = "Polem";
+
+  return lemmatizedNer;
 }
 
-std::vector<Json> lemmatizeNerLabels(const std::vector<Json>& nerLabels,
-                                     const std::vector<std::string>& posTagValues)
+std::string toLowercase(std::string str)
+{
+  std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c){return std::tolower(c);});
+  return str;
+}
+
+std::tuple<std::string, std::string>
+buildPosAndLemmaStringsForNerLabel(const Json& nerLabel,
+                                   const std::vector<std::string>& posTagValues,
+                                   const std::vector<std::string>& lemmaTagValues)
+{
+  const int nerStartToken = nerLabel.at("startToken");
+  const int nerEndToken = nerLabel.at("endToken");
+  if (int(posTagValues.size()) <= nerEndToken)
+      throw std::runtime_error("Missing posTag and/or lemma labels!");
+
+  std::string posTags, lemmaTags;
+  for (int token = nerStartToken; token <= nerEndToken; ++token)
+  {
+    posTags += toLowercase(posTagValues[token]);
+    lemmaTags += toLowercase(lemmaTagValues[token]);
+
+    if (token == nerEndToken)
+      continue;
+
+    posTags += " ";
+    lemmaTags += " ";
+  }
+
+  return std::make_tuple(posTags, lemmaTags);
+}
+
+std::vector<Json> lemmatizeNerLabels(const std::vector<nlohmann::json>& nerLabels,
+                                     const std::vector<std::string>& posTagValues,
+                                     const std::vector<std::string>& lemmaTagValues)
 { 
+  if (posTagValues.size() != lemmaTagValues.size())
+    throw std::runtime_error("Different counts of posTag and lemma labels!");
+
   std::vector<Json> lemmatizedLabels;
   for (const auto& nerLabel : nerLabels)
-    lemmatizedLabels.push_back(lemmatizeNerLabel(nerLabel));
+  {
+    auto posTagAndLemma = buildPosAndLemmaStringsForNerLabel(nerLabel, posTagValues, lemmaTagValues);
+    lemmatizedLabels.push_back(lemmatizeNerLabel(nerLabel,
+                                                 std::get<0>(posTagAndLemma),
+                                                 std::get<1>(posTagAndLemma)));
+  }
   return lemmatizedLabels;
 }
 
@@ -84,8 +130,8 @@ std::vector<std::string> buildTagValueList(const std::string& tagFieldName,
 
     size_t tagPosition = label.at("startToken");
     size_t tagEnd = label.at("endToken");
-    if (tagEnd - tagPosition > 1)
-      throw std::runtime_error("posTag endToken-startToken > 1");
+    if (tagEnd - tagPosition != 1)
+      throw std::runtime_error("posTag endToken-startToken != 1");
 
     if (tagPosition > lastTagPosition)
       lastTagPosition = tagPosition;
