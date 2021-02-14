@@ -1,4 +1,9 @@
 # polem-microservice
 Small demo project using the Polem library to process and serve JSON data.
 
-Polem: https://github.com/CLARIN-PL/Polem
+![Result example](./demo/correct_request.gif)
+
+### Used Libraries
+- Polem: https://github.com/CLARIN-PL/Polem  
+- nlohmann/json: https://github.com/nlohmann/json  
+- Pistache: https://github.com/pistacheio/pistache  
