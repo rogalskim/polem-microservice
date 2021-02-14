@@ -1,6 +1,7 @@
 #include "rest_request_handler.h"
 
 #include <iomanip>
+#include <sstream>
 
 #include "nlohmann_json/json.hpp"
 
@@ -10,37 +11,31 @@ using namespace Pistache;
 
 using Json = nlohmann::json;
 
+namespace
+{
+
+auto getContentType(const Http::Request& request)
+{
+  return request.headers().get<Http::Header::ContentType>()->mime();
+}
+
+}
+
 void RestRequestHandler::onRequest(const Http::Request& request, Http::ResponseWriter response)
 {
-  auto requestContentHeader = request.headers().get<Http::Header::ContentType>();
-  auto requestContentType = requestContentHeader->mime();
+  std::cout << composeRequestDescription(request);
 
-  std::cout << "> Received Request\n";
-  std::cout << "  Host: " << request.address().host() << "\n";
-  std::cout << "  Port: " << request.address().port() << "\n";
-  std::cout << "  Method: " << request.method() << "\n";
-  std::cout << "  Resource: " << request.resource() << "\n";
-  std::cout << "  Content Type: " << requestContentType.raw() << "\n";
-  std::cout << "  Body Length: " << request.body().size() << "\n";
-
-  if (request.method() != Http::Method::Post)
+  if (!isRequestValid(request))
   {
     std::cout << "> Request Rejected\n";
-    response.send(Http::Code::Bad_Request, "Invalid request method; only POST is accepted.\n");
+    sendErrorResponse(request, response);
     return;
   }
 
-  if (requestContentType != Http::Mime::MediaType::fromString("application/json"))
-  {
-    std::cout << "> Request Rejected\n";
-    response.send(Http::Code::Unsupported_Media_Type, "Invalid request content type; \"application/json\" expected.\n");
-    return;
-  }
-
-  Json json = Json::parse(request.body());
+  std::string lemmatizedJson;
   try
   {
-    label_processing::findAndLemmatizeNerLabelsInJson(json);
+    lemmatizedJson = lemmatizeRequestJson(request);
   }
   catch (const std::runtime_error& exception)
   {
@@ -51,9 +46,49 @@ void RestRequestHandler::onRequest(const Http::Request& request, Http::ResponseW
   std::cout << "> Input JSON processed successfully, sending response...\n";
 
   response.setMime(Http::Mime::MediaType::fromString("application/json"));
-  std::stringstream prettyOutputJson;
-  prettyOutputJson << std::setw(2) << json << "\n";
-  response.send(Http::Code::Ok, prettyOutputJson.str());
+  response.send(Http::Code::Ok, lemmatizedJson);
 
   std::cout << "> Done\n";
+}
+
+std::string RestRequestHandler::composeRequestDescription(const Http::Request& request) const
+{
+  std::stringstream description;
+  description << "> Received Request\n";
+  description << "  Host: " << request.address().host() << "\n";
+  description << "  Port: " << request.address().port() << "\n";
+  description << "  Method: " << request.method() << "\n";
+  description << "  Resource: " << request.resource() << "\n";
+  description << "  Content Type: " << getContentType(request).raw() << "\n";
+  description << "  Body Length: " << request.body().size() << "\n";
+
+  return description.str();
+}
+
+bool RestRequestHandler::isRequestValid(const Http::Request& request) const
+{
+  auto requestContentType = getContentType(request);
+  const bool isPost = request.method() == Http::Method::Post;
+  const bool isJson = requestContentType == Http::Mime::MediaType::fromString("application/json");
+  return isPost && isJson;
+}
+
+void RestRequestHandler::sendErrorResponse(const Http::Request& request,
+                                           Http::ResponseWriter& response) const
+{
+  if (request.method() != Http::Method::Post)
+    response.send(Http::Code::Bad_Request, "Invalid request method; only POST is accepted.\n");
+
+  if (getContentType(request) != Http::Mime::MediaType::fromString("application/json"))
+    response.send(Http::Code::Unsupported_Media_Type,
+                  "Invalid request content type; \"application/json\" expected.\n");
+}
+
+std::string RestRequestHandler::lemmatizeRequestJson(const Http::Request& request) const
+{
+  Json json = Json::parse(request.body());
+  label_processing::findAndLemmatizeNerLabelsInJson(json);
+  std::stringstream prettyOutputJson;
+  prettyOutputJson << std::setw(2) << json << "\n";
+  return prettyOutputJson.str();
 }
