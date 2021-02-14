@@ -5,10 +5,13 @@ CONFIG -= qt
 
 SOURCES += \
         label_processing.cpp \
-        main.cpp
+        main.cpp \
+        rest_request_handler.cpp
 
 HEADERS += \
-  label_processing.h
+  disk_input.h \
+  label_processing.h \
+  rest_request_handler.h
 
 unix: LIBS += -L$$PWD/../../../usr/local/lib/ -lpolem-dev
 INCLUDEPATH += $$PWD/../../../usr/local/include
