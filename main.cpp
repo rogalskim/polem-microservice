@@ -45,56 +45,73 @@ public:
 
   void onRequest(const Http::Request& request, Http::ResponseWriter response) override
   {
-    if (request.method() != Http::Method::Post)
-      response.send(Http::Code::Bad_Request, "Invalid request method; only POST is accepted.\n");
-
     auto requestContentHeader = request.headers().get<Http::Header::ContentType>();
     auto requestContentType = requestContentHeader->mime();
+
+    std::cout << "> Received Request\n";
+    std::cout << "  Host: " << request.address().host() << "\n";
+    std::cout << "  Port: " << request.address().port() << "\n";
+    std::cout << "  Method: " << request.method() << "\n";
+    std::cout << "  Resource: " << request.resource() << "\n";
+    std::cout << "  Content Type: " << requestContentType.raw() << "\n";
+    std::cout << "  Body Length: " << request.body().size() << "\n";
+
+    if (request.method() != Http::Method::Post)
+    {
+      std::cout << "> Request Rejected\n";
+      response.send(Http::Code::Bad_Request, "Invalid request method; only POST is accepted.\n");
+      return;
+    }
+
     if (requestContentType != Http::Mime::MediaType::fromString("application/json"))
-      response.send(Http::Code::Bad_Request, "Invalid request content type; \"application/json\" expected.\n");
+    {
+      std::cout << "> Request Rejected\n";
+      response.send(Http::Code::Unsupported_Media_Type, "Invalid request content type; \"application/json\" expected.\n");
+      return;
+    }
 
-    std::stringstream reply;
-    reply << "Received Request\n";
-    reply << "----------------\n";
-    reply << "Host: " << request.address().host() << "\n";
-    reply << "Port: " << request.address().port() << "\n";
-    reply << "Method: " << request.method() << "\n";
-    reply << "Resource: " << request.resource() << "\n";
-    reply << "Header Count: " << request.headers().list().size() << "\n";
-    reply << "Content Type: " << requestContentType.raw() << "\n";
-    reply << "Body: \n" << request.body() << "\n\n";
+    Json json = Json::parse(request.body());
+    try
+    {
+      label_processing::findAndLemmatizeNerLabelsInJson(json);
+    }
+    catch (const std::runtime_error& exception)
+    {
+      std::cout << "> Failed to process input JSON: " << exception.what() << "\n";
+      response.send(Http::Code::Unprocessable_Entity, exception.what());
+    }
 
-    response.send(Http::Code::Ok, reply.str() + "\n");
+    std::cout << "> Input JSON processed successfully, sending response...\n";
+
+    response.setMime(Http::Mime::MediaType::fromString("application/json"));
+    std::stringstream prettyOutputJson;
+    prettyOutputJson << std::setw(2) << json << "\n";
+    response.send(Http::Code::Ok, prettyOutputJson.str());
+
+    std::cout << "> Done\n";
   }
 };
 
 int main()
 {
-  std::cout << "Starting the server!\n";
+  std::cout << "> Starting the server...\n";
 
   Address address(Ipv4::any(), Port(5000));
 
   const int serverThreadCount = 1;
-  auto options = Http::Endpoint::options().threads(serverThreadCount);
-  Http::Endpoint server(address);
+  const int maxRequestBytes = 1024*1024;
+  const int maxResponseBytes = 1024*1024;
+  auto options = Http::Endpoint::options()
+      .threads(serverThreadCount)
+      .maxRequestSize(maxRequestBytes)
+      .maxResponseSize(maxResponseBytes);
 
+  Http::Endpoint server(address);
   server.init(options);
   server.setHandler(Http::make_handler<RestRequestHandler>());
+
+  std::cout << "> Ready to serve!\n";
   server.serve();
 
   return 0;
-/*
-  try
-  {
-    auto json = readJsonFromDisk("../data/test_input.json");
-    label_processing::findAndLemmatizeNerLabelsInJson(json);
-    std::cout << std::setw(4) << json << std::endl;
-    return 0;
-  }
-  catch (const std::runtime_error& exception)
-  {
-    std::cout << exception.what() << "\nAborting...\n";
-    return 1;
-  }
-*/
 }
